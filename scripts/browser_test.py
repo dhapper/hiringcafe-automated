@@ -19,9 +19,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from portals import lever
 
 TEST_URL = (
-    "https://hiringcafe.com/job/"
-    "qa-automation-tester-flynn-group-of-companies-mississauga-ontario-0emj38xyd6tl6ksh"
-    "?utm_source=claude&utm_medium=llm-app&utm_campaign=mcp"
+    "https://hiringcafe.com/job/qa-automation-tester-flynn-group-of-companies-mississauga-ontario-0emj38xyd6tl6ksh?utm_source=claude&utm_medium=llm-app&utm_campaign=mcp"
+    # "https://hiringcafe.com/job/software-engineer-ii-emburse-toronto-ontario-0b1cq9k7t9jmfd5i?utm_source=claude&utm_medium=llm-app&utm_campaign=mcp"
 )
 
 APPLY_SELECTOR = '[data-testid="job-page-apply"]'
