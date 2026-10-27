@@ -1,38 +1,40 @@
-"""Test HiringCafe Apply and dispatch to the detected application portal."""
+"""Open a HiringCafe job and dispatch to its application portal.
 
+Keeps Chrome open for manual review until application_flow.py signals
+that the user has selected an outcome. Never submits an application.
+"""
+
+import argparse
 import logging
-import subprocess
 import sys
 import time
 from pathlib import Path
 
 from selenium import webdriver
-from selenium.common.exceptions import (
-    TimeoutException,
-    WebDriverException,
-)
+from selenium.common.exceptions import TimeoutException, WebDriverException
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 
-# Import the Lever handler from the sibling portals folder.
-from portals import lever
+from portals import lever, workday
 
-TEST_URL = (
-    "https://hiringcafe.com/job/qa-automation-tester-flynn-group-of-companies-mississauga-ontario-0emj38xyd6tl6ksh?utm_source=claude&utm_medium=llm-app&utm_campaign=mcp"
-    # "https://hiringcafe.com/job/software-engineer-ii-emburse-toronto-ontario-0b1cq9k7t9jmfd5i?utm_source=claude&utm_medium=llm-app&utm_campaign=mcp"
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
+DEFAULT_TEST_URL = (
+    "https://hiringcafe.com/job/"
+    "qa-automation-tester-flynn-group-of-companies-mississauga-ontario-"
+    "0emj38xyd6tl6ksh"
+    "?utm_source=claude&utm_medium=llm-app&utm_campaign=mcp"
 )
 
 APPLY_SELECTOR = '[data-testid="job-page-apply"]'
-PORTALS_DIR = Path(__file__).resolve().parent / "portals"
 
-# Lever is integrated directly into this browser session.
-# Other portal scripts retain their existing standalone behavior for now.
-PORTAL_SCRIPTS = {
-    "workday": "workday.py",
-    "ashbyhq": "ashbyhq.py",
-    "workforcenow": "workforcenow.py",
-}
+PORTAL_KEYWORDS = (
+    "lever",
+    "workday",
+    "ashbyhq",
+    "workforcenow",
+)
 
 logging.basicConfig(
     level=logging.INFO,
@@ -41,47 +43,67 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+def parse_arguments():
+    parser = argparse.ArgumentParser(
+        description="Open a HiringCafe job and detect its application portal."
+    )
+    parser.add_argument(
+        "--url",
+        default=DEFAULT_TEST_URL,
+        help="HiringCafe job URL to open.",
+    )
+    parser.add_argument(
+        "--wait-for-review",
+        action="store_true",
+        help="Keep Chrome open until application_flow.py signals closure.",
+    )
+    return parser.parse_args()
+
+
 def dispatch_portal(driver, url: str) -> bool:
-    """Dispatch to the detected portal handler."""
+    """Run implemented handlers only; never launch placeholder scripts."""
     normalized_url = url.lower()
 
     if "lever" in normalized_url:
-        logger.info("Detected portal 'lever'. Using existing Chrome session.")
+        logger.info("Detected Lever. Using the existing Chrome session.")
         lever.run(driver)
         return True
 
-    for keyword, script_name in PORTAL_SCRIPTS.items():
+    if "workday" in normalized_url or "myworkdayjobs.com" in normalized_url:
+        logger.info("Detected Workday. Starting handler.")
+        workday.run(driver)
+        return True
+
+    for keyword in PORTAL_KEYWORDS:
         if keyword in normalized_url:
-            script_path = PORTALS_DIR / script_name
-
-            if not script_path.is_file():
-                logger.error("Portal script not found: %s", script_path)
-                return False
-
+            logger.info("Detected application portal: %s", keyword)
             logger.info(
-                "Detected portal '%s'. Launching %s",
-                keyword,
-                script_path.name,
+                "No automated handler is implemented for this portal yet. "
+                "Leave the page open for manual review."
             )
-            subprocess.Popen([sys.executable, str(script_path)])
-            return True
+            return False
 
-    logger.warning("Unknown application portal URL: %s", url)
+    logger.warning("Unrecognized application portal: %s", url)
+    logger.info("Leave the open browser page available for manual review.")
     return False
 
 
-def main() -> None:
-    """Open HiringCafe, click Apply, and run the detected portal handler."""
-    logger.info("Opening test URL: %s", TEST_URL)
+def main():
+    args = parse_arguments()
+    job_url = args.url.strip()
 
+    if not job_url.startswith(("https://", "http://")):
+        raise ValueError("The supplied job URL must begin with http:// or https://.")
+
+    logger.info("Opening HiringCafe job: %s", job_url)
+
+    # Do not enable detach. We want Selenium to close Chrome when finished.
     options = Options()
-    options.add_experimental_option("detach", True)
-
     driver = webdriver.Chrome(options=options)
+    workflow_completed = False
 
     try:
-        driver.get(TEST_URL)
-
+        driver.get(job_url)
         wait = WebDriverWait(driver, 30)
 
         wait.until(
@@ -104,25 +126,20 @@ def main() -> None:
         original_url = driver.current_url
         original_handles = set(driver.window_handles)
 
-        logger.info("Clicking visible button: %r", apply_button.text)
+        logger.info("Clicking HiringCafe Apply button: %r", apply_button.text)
         apply_button.click()
-
-        logger.info("Waiting for the application site to open...")
 
         try:
             WebDriverWait(driver, 15).until(
                 lambda d: (
-                    len(d.window_handles) > len(original_handles)
+                    len(set(d.window_handles) - original_handles) > 0
                     or d.current_url != original_url
                 )
             )
         except TimeoutException:
             logger.warning("No new tab or URL change detected within 15 seconds.")
 
-        logger.info("Waiting 5 seconds for the application site to load...")
-        time.sleep(5)
-
-        logger.info("Open tabs: %d", len(driver.window_handles))
+        time.sleep(3)
 
         portal_handle = None
         portal_url = None
@@ -131,24 +148,15 @@ def main() -> None:
             try:
                 driver.switch_to.window(handle)
                 tab_url = driver.current_url
-                tab_title = driver.title
 
                 logger.info(
                     "Tab %d: title=%r URL=%s",
                     index,
-                    tab_title,
+                    driver.title,
                     tab_url,
                 )
 
-                if any(
-                    keyword in tab_url.lower()
-                    for keyword in (
-                        "lever",
-                        "workday",
-                        "ashbyhq",
-                        "workforcenow",
-                    )
-                ):
+                if any(keyword in tab_url.lower() for keyword in PORTAL_KEYWORDS):
                     portal_handle = handle
                     portal_url = tab_url
 
@@ -156,25 +164,47 @@ def main() -> None:
                 logger.warning("Could not inspect tab %d.", index)
 
         if portal_handle is None or portal_url is None:
-            logger.error("Could not find a recognized application portal tab.")
-            return
-
-        # Select the actual portal tab before calling its handler.
-        driver.switch_to.window(portal_handle)
-
-        logger.info("Selected application tab: %s", driver.current_url)
-        dispatch_portal(driver, portal_url)
+            logger.warning("No recognized application portal was detected.")
+            logger.info("Chrome will remain available for manual review.")
+        else:
+            driver.switch_to.window(portal_handle)
+            logger.info("Selected portal URL: %s", portal_url)
+            dispatch_portal(driver, portal_url)
 
         logger.info(
-            "Test complete. No application details were filled in or submitted."
+            "Browser is ready for manual review. "
+            "The application will NOT be submitted automatically."
         )
+        workflow_completed = True
+
+        ready_file = PROJECT_ROOT / "data" / "browser_review_ready.txt"
+        ready_file.parent.mkdir(parents=True, exist_ok=True)
+        ready_file.write_text("ready", encoding="utf-8")
+
+        if args.wait_for_review:
+            logger.info(
+                "Waiting for application_flow.py to finish the outcome prompt "
+                "before closing Chrome."
+            )
+            # application_flow.py sends this line after the user chooses
+            # an outcome. The child receives it through its piped stdin.
+            sys.stdin.readline()
 
     except (TimeoutException, WebDriverException):
-        logger.exception("Browser test failed.")
+        logger.exception("Browser workflow failed.")
+        raise
 
     finally:
-        # Do not call driver.quit(): Chrome should remain open for inspection.
-        logger.info("Leaving Chrome open for manual inspection.")
+        if args.wait_for_review and not workflow_completed:
+            logger.error(
+                "Browser workflow did not complete successfully; " "closing Chrome."
+            )
+
+        try:
+            driver.quit()
+            logger.info("Chrome closed.")
+        except WebDriverException:
+            logger.warning("Chrome was already closed.")
 
 
 if __name__ == "__main__":

@@ -1,4 +1,3 @@
-
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -7,7 +6,6 @@ JOBS_JSON = DATA_DIR / "jobs.json"
 
 HIRINGCAFE_MCP_URL = "https://hiringcafe.com/api/mcp"
 
-# Broad searches so we don't exclude too many potentially relevant roles.
 SEARCH_QUERIES = [
     "software developer",
     "software engineer",
@@ -23,7 +21,12 @@ EMPLOYMENT_TYPES = ["Full Time", "Contract"]
 SENIORITY_LEVELS = ["Entry Level", "Mid Level"]
 
 MAX_YEARS_EXPERIENCE = 5
-POSTED_WITHIN_DAYS = 14
-RESULTS_PER_QUERY = 10
+
+# Ask HiringCafe for a much narrower set of recent postings.
+# The discovery script will still verify the exact posting date.
+POSTED_WITHIN_DAYS = 1
+
+# Request more results for each search, instead of only 10.
+RESULTS_PER_QUERY = 25
 
 REQUEST_TIMEOUT_SECONDS = 45

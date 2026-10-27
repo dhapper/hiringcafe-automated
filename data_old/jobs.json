@@ -1,0 +1,397 @@
+{
+  "updated_at": "2026-10-22T21:36:34-04:00",
+  "source": "HiringCafe MCP",
+  "job_count": 39,
+  "jobs": [
+    {
+      "job_id": "bl9rkt2u6grdoeua",
+      "title": "AI Developer – Actuarial Tools & Automation (PathWise)",
+      "company": "Aon",
+      "location": "Toronto, Ontario, Canada",
+      "job_url": "https://hiringcafe.com/job/ai-developer-actuarial-tools-and-automation-pathwise-aon-toronto-bl9rkt2u6grdoeua?utm_source=claude&utm_medium=llm-app&utm_campaign=mcp",
+      "posted_at": "2026-10-05",
+      "discovered_at": "2026-10-22T21:36:33-04:00",
+      "source": "HiringCafe"
+    },
+    {
+      "job_id": "m6acoahm5nnn39tn",
+      "title": "Software Developer",
+      "company": "LogiSense Corporation",
+      "location": "Canada or Toronto",
+      "job_url": "https://hiringcafe.com/job/software-developer-logisense-corporation-toronto-ontario-m6acoahm5nnn39tn?utm_source=claude&utm_medium=llm-app&utm_campaign=mcp",
+      "posted_at": "2026-10-05",
+      "discovered_at": "2026-10-22T21:36:33-04:00",
+      "source": "HiringCafe"
+    },
+    {
+      "job_id": "80igicomopu7ipy6",
+      "title": "Developer/Technical Architect - Microsoft D365 Customer Engagement",
+      "company": "EY",
+      "location": "Toronto, Ontario, Canada",
+      "job_url": "https://hiringcafe.com/job/developer-technical-architect-microsoft-d365-customer-engagement-ey-80igicomopu7ipy6?utm_source=claude&utm_medium=llm-app&utm_campaign=mcp",
+      "posted_at": "2026-10-05",
+      "discovered_at": "2026-10-22T21:36:34-04:00",
+      "source": "HiringCafe"
+    },
+    {
+      "job_id": "0b1cq9k7t9jmfd5i",
+      "title": "Software Engineer II",
+      "company": "Emburse",
+      "location": "Toronto, Ontario, Canada",
+      "job_url": "https://hiringcafe.com/job/software-engineer-ii-emburse-toronto-ontario-0b1cq9k7t9jmfd5i?utm_source=claude&utm_medium=llm-app&utm_campaign=mcp",
+      "posted_at": "2026-10-06",
+      "discovered_at": "2026-10-22T21:36:32-04:00",
+      "source": "HiringCafe"
+    },
+    {
+      "job_id": "rc9qi82d2rcjd9sc",
+      "title": "Software Developer- RPA / UiPath Specialist",
+      "company": "OpenText",
+      "location": "Waterloo or Mississauga or Richmond Hill",
+      "job_url": "https://hiringcafe.com/job/software-developer-rpa-uipath-specialist-opentext-waterloo-ontario-rc9qi82d2rcjd9sc?utm_source=claude&utm_medium=llm-app&utm_campaign=mcp",
+      "posted_at": "2026-10-06",
+      "discovered_at": "2026-10-22T21:36:33-04:00",
+      "source": "HiringCafe"
+    },
+    {
+      "job_id": "pmioayf5650cqsgq",
+      "title": "Software Developer",
+      "company": "Ford",
+      "location": "Waterloo or Oakville",
+      "job_url": "https://hiringcafe.com/job/software-developer-ford-waterloo-ontario-pmioayf5650cqsgq?utm_source=claude&utm_medium=llm-app&utm_campaign=mcp",
+      "posted_at": "2026-10-07",
+      "discovered_at": "2026-10-22T21:36:31-04:00",
+      "source": "HiringCafe"
+    },
+    {
+      "job_id": "7qcxtq0vtl2x1lda",
+      "title": "IT Business Analyst (ServiceNow)",
+      "company": "The Redpath Group",
+      "location": "Vaughan or North Bay",
+      "job_url": "https://hiringcafe.com/job/it-business-analyst-servicenow-the-redpath-group-vaughan-ontario-7qcxtq0vtl2x1lda?utm_source=claude&utm_medium=llm-app&utm_campaign=mcp",
+      "posted_at": "2026-10-07",
+      "discovered_at": "2026-10-22T21:36:32-04:00",
+      "source": "HiringCafe"
+    },
+    {
+      "job_id": "0emj38xyd6tl6ksh",
+      "title": "QA Automation Tester",
+      "company": "Flynn Group of Companies",
+      "location": "Mississauga, Ontario, Canada",
+      "job_url": "https://hiringcafe.com/job/qa-automation-tester-flynn-group-of-companies-mississauga-ontario-0emj38xyd6tl6ksh?utm_source=claude&utm_medium=llm-app&utm_campaign=mcp",
+      "posted_at": "2026-10-07",
+      "discovered_at": "2026-10-22T21:36:33-04:00",
+      "source": "HiringCafe"
+    },
+    {
+      "job_id": "ulc5ek6xfba07qjk",
+      "title": "Software Engineer, Android",
+      "company": "Mecka AI",
+      "location": "Richmond Hill, Ontario, Canada",
+      "job_url": "https://hiringcafe.com/job/software-engineer-android-mecka-ai-richmond-hill-ontario-ulc5ek6xfba07qjk?utm_source=claude&utm_medium=llm-app&utm_campaign=mcp",
+      "posted_at": "2026-10-07",
+      "discovered_at": "2026-10-22T21:36:33-04:00",
+      "source": "HiringCafe"
+    },
+    {
+      "job_id": "zio9bbgecgoggh38",
+      "title": "Analyst, Data Management & Visualization",
+      "company": "Interpublic Group",
+      "location": "Toronto, Ontario, Canada",
+      "job_url": "https://hiringcafe.com/job/analyst-data-management-and-visualization-interpublic-group-toronto-zio9bbgecgoggh38?utm_source=claude&utm_medium=llm-app&utm_campaign=mcp",
+      "posted_at": "2026-10-07",
+      "discovered_at": "2026-10-22T21:36:34-04:00",
+      "source": "HiringCafe"
+    },
+    {
+      "job_id": "ujj6czczbe0yn75i",
+      "title": "Software Engineer, Email",
+      "company": "Doppel",
+      "location": "United States or San Francisco or New York City or Toronto",
+      "job_url": "https://hiringcafe.com/job/software-engineer-email-doppel-san-francisco-california-ujj6czczbe0yn75i?utm_source=claude&utm_medium=llm-app&utm_campaign=mcp",
+      "posted_at": "2026-10-08",
+      "discovered_at": "2026-10-22T21:36:31-04:00",
+      "source": "HiringCafe"
+    },
+    {
+      "job_id": "4hmmn62rx4wqbkx9",
+      "title": "Junior IT Analyst",
+      "company": "Weldco-Beales Manufacturing",
+      "location": "Barrie, Ontario, Canada",
+      "job_url": "https://hiringcafe.com/job/junior-it-analyst-weldco-beales-manufacturing-barrie-ontario-4hmmn62rx4wqbkx9?utm_source=claude&utm_medium=llm-app&utm_campaign=mcp",
+      "posted_at": "2026-10-08",
+      "discovered_at": "2026-10-22T21:36:32-04:00",
+      "source": "HiringCafe"
+    },
+    {
+      "job_id": "thb9gn2bd4lecw2l",
+      "title": "Analyst, IT Support",
+      "company": "Trans-Northern Pipelines",
+      "location": "Richmond Hill, Ontario, Canada",
+      "job_url": "https://hiringcafe.com/job/analyst-it-support-trans-northern-pipelines-richmond-hill-ontario-thb9gn2bd4lecw2l?utm_source=claude&utm_medium=llm-app&utm_campaign=mcp",
+      "posted_at": "2026-10-08",
+      "discovered_at": "2026-10-22T21:36:32-04:00",
+      "source": "HiringCafe"
+    },
+    {
+      "job_id": "vk0tmralx9xhqm1z",
+      "title": "Analyst, Enterprise IT VMO",
+      "company": "McKesson Corporation",
+      "location": "Mississauga, Ontario, Canada",
+      "job_url": "https://hiringcafe.com/job/analyst-enterprise-it-vmo-mckesson-corporation-mississauga-ontario-vk0tmralx9xhqm1z?utm_source=claude&utm_medium=llm-app&utm_campaign=mcp",
+      "posted_at": "2026-10-08",
+      "discovered_at": "2026-10-22T21:36:32-04:00",
+      "source": "HiringCafe"
+    },
+    {
+      "job_id": "eaxhkja87cxbrs7v",
+      "title": "Automation Engineer",
+      "company": "Zurich Insurance Group",
+      "location": "Toronto, Ontario, Canada",
+      "job_url": "https://hiringcafe.com/job/automation-engineer-zurich-insurance-group-toronto-ontario-eaxhkja87cxbrs7v?utm_source=claude&utm_medium=llm-app&utm_campaign=mcp",
+      "posted_at": "2026-10-08",
+      "discovered_at": "2026-10-22T21:36:33-04:00",
+      "source": "HiringCafe"
+    },
+    {
+      "job_id": "xkhkecy47kpeed2s",
+      "title": "Power Platform Developer",
+      "company": "Atlantic Packaging",
+      "location": "Scarborough, Ontario, Canada",
+      "job_url": "https://hiringcafe.com/job/power-platform-developer-atlantic-packaging-scarborough-ontario-xkhkecy47kpeed2s?utm_source=claude&utm_medium=llm-app&utm_campaign=mcp",
+      "posted_at": "2026-10-08",
+      "discovered_at": "2026-10-22T21:36:34-04:00",
+      "source": "HiringCafe"
+    },
+    {
+      "job_id": "3505y56dtz9la9st",
+      "title": "Junior Software Developer",
+      "company": "ATS Corporation",
+      "location": "Woodbridge, Ontario, Canada",
+      "job_url": "https://hiringcafe.com/job/junior-software-developer-ats-corporation-woodbridge-ontario-3505y56dtz9la9st?utm_source=claude&utm_medium=llm-app&utm_campaign=mcp",
+      "posted_at": "2026-10-09",
+      "discovered_at": "2026-10-22T21:36:31-04:00",
+      "source": "HiringCafe"
+    },
+    {
+      "job_id": "11mi5j4hkhb3lq3t",
+      "title": "IT Support Analyst IV",
+      "company": "TD Bank Group",
+      "location": "Toronto, Ontario, Canada",
+      "job_url": "https://hiringcafe.com/job/it-support-analyst-iv-td-bank-group-toronto-ontario-11mi5j4hkhb3lq3t?utm_source=claude&utm_medium=llm-app&utm_campaign=mcp",
+      "posted_at": "2026-10-09",
+      "discovered_at": "2026-10-22T21:36:32-04:00",
+      "source": "HiringCafe"
+    },
+    {
+      "job_id": "6nnnvmxyok66hwil",
+      "title": "M365 Solutions Specialist",
+      "company": "University of Toronto",
+      "location": "Toronto, Ontario, Canada",
+      "job_url": "https://hiringcafe.com/job/m365-solutions-specialist-university-of-toronto-toronto-ontario-6nnnvmxyok66hwil?utm_source=claude&utm_medium=llm-app&utm_campaign=mcp",
+      "posted_at": "2026-10-09",
+      "discovered_at": "2026-10-22T21:36:34-04:00",
+      "source": "HiringCafe"
+    },
+    {
+      "job_id": "0w4oqwxvm0e2020e",
+      "title": "AI Automation Engineer",
+      "company": "Osmow's",
+      "location": "Mississauga, Ontario, Canada",
+      "job_url": "https://hiringcafe.com/job/ai-automation-engineer-osmows-mississauga-ontario-0w4oqwxvm0e2020e?utm_source=claude&utm_medium=llm-app&utm_campaign=mcp",
+      "posted_at": "2026-10-10",
+      "discovered_at": "2026-10-22T21:36:33-04:00",
+      "source": "HiringCafe"
+    },
+    {
+      "job_id": "4q8ignmz75d3uj57",
+      "title": "AI Software Engineer",
+      "company": "Snowflake",
+      "location": "Toronto, Ontario, Canada",
+      "job_url": "https://hiringcafe.com/job/ai-software-engineer-snowflake-toronto-ontario-4q8ignmz75d3uj57?utm_source=claude&utm_medium=llm-app&utm_campaign=mcp",
+      "posted_at": "2026-10-13",
+      "discovered_at": "2026-10-22T21:36:32-04:00",
+      "source": "HiringCafe"
+    },
+    {
+      "job_id": "kq43r5h7idqfuyab",
+      "title": "IT Operations Analyst– HPE Non-Stop Operations",
+      "company": "Royal Bank of Canada",
+      "location": "Toronto, Ontario, Canada",
+      "job_url": "https://hiringcafe.com/job/it-operations-analyst-hpe-non-stop-operations-royal-bank-of-canada-kq43r5h7idqfuyab?utm_source=claude&utm_medium=llm-app&utm_campaign=mcp",
+      "posted_at": "2026-10-13",
+      "discovered_at": "2026-10-22T21:36:32-04:00",
+      "source": "HiringCafe"
+    },
+    {
+      "job_id": "rg0mzti53iw4fo2b",
+      "title": "Developer, QA Automation",
+      "company": "Porter Airlines",
+      "location": "Toronto, Ontario, Canada",
+      "job_url": "https://hiringcafe.com/job/developer-qa-automation-porter-airlines-toronto-ontario-rg0mzti53iw4fo2b?utm_source=claude&utm_medium=llm-app&utm_campaign=mcp",
+      "posted_at": "2026-10-13",
+      "discovered_at": "2026-10-22T21:36:33-04:00",
+      "source": "HiringCafe"
+    },
+    {
+      "job_id": "uc2wgy0lnl689jd4",
+      "title": "Software Engineer",
+      "company": "Citi",
+      "location": "Mississauga, Ontario, Canada",
+      "job_url": "https://hiringcafe.com/job/software-engineer-citi-mississauga-ontario-uc2wgy0lnl689jd4?utm_source=claude&utm_medium=llm-app&utm_campaign=mcp",
+      "posted_at": "2026-10-14",
+      "discovered_at": "2026-10-22T21:36:31-04:00",
+      "source": "HiringCafe"
+    },
+    {
+      "job_id": "u0hx1kis4arr6x8u",
+      "title": "Software Engineer",
+      "company": "Fellow",
+      "location": "Canada or Montreal or Toronto or Ottawa",
+      "job_url": "https://hiringcafe.com/job/software-engineer-fellow-montreal-quebec-u0hx1kis4arr6x8u?utm_source=claude&utm_medium=llm-app&utm_campaign=mcp",
+      "posted_at": "2026-10-14",
+      "discovered_at": "2026-10-22T21:36:31-04:00",
+      "source": "HiringCafe"
+    },
+    {
+      "job_id": "x06i1bnu06okd3ig",
+      "title": "Test Development Engineer  - Toronto",
+      "company": "Island",
+      "location": "Toronto, Ontario, Canada",
+      "job_url": "https://hiringcafe.com/job/test-development-engineer-toronto-island-toronto-ontario-x06i1bnu06okd3ig?utm_source=claude&utm_medium=llm-app&utm_campaign=mcp",
+      "posted_at": "2026-10-14",
+      "discovered_at": "2026-10-22T21:36:33-04:00",
+      "source": "HiringCafe"
+    },
+    {
+      "job_id": "267x23hbn11oabsi",
+      "title": "Software Engineer II - Engineer",
+      "company": "Uber",
+      "location": "Toronto, Ontario, Canada",
+      "job_url": "https://hiringcafe.com/job/software-engineer-ii-engineer-uber-toronto-ontario-267x23hbn11oabsi?utm_source=claude&utm_medium=llm-app&utm_campaign=mcp",
+      "posted_at": "2026-10-15",
+      "discovered_at": "2026-10-22T21:36:32-04:00",
+      "source": "HiringCafe"
+    },
+    {
+      "job_id": "urbn7azq86cnigyh",
+      "title": "IT Care Analyst",
+      "company": "Aviva",
+      "location": "Markham, Ontario, Canada",
+      "job_url": "https://hiringcafe.com/job/it-care-analyst-aviva-markham-ontario-urbn7azq86cnigyh?utm_source=claude&utm_medium=llm-app&utm_campaign=mcp",
+      "posted_at": "2026-10-15",
+      "discovered_at": "2026-10-22T21:36:32-04:00",
+      "source": "HiringCafe"
+    },
+    {
+      "job_id": "hcpoy8wr519zn08d",
+      "title": "Software Developer",
+      "company": "Xe",
+      "location": "Newmarket, Ontario, Canada",
+      "job_url": "https://hiringcafe.com/job/software-developer-xe-newmarket-ontario-hcpoy8wr519zn08d?utm_source=claude&utm_medium=llm-app&utm_campaign=mcp",
+      "posted_at": "2026-10-16",
+      "discovered_at": "2026-10-22T21:36:31-04:00",
+      "source": "HiringCafe"
+    },
+    {
+      "job_id": "ekul0heq53lxlabz",
+      "title": "Software Developer(Android focused)",
+      "company": "SOTI",
+      "location": "Mississauga, Ontario, Canada",
+      "job_url": "https://hiringcafe.com/job/software-developer-android-focused-soti-mississauga-ontario-ekul0heq53lxlabz?utm_source=claude&utm_medium=llm-app&utm_campaign=mcp",
+      "posted_at": "2026-10-16",
+      "discovered_at": "2026-10-22T21:36:31-04:00",
+      "source": "HiringCafe"
+    },
+    {
+      "job_id": "6c41bdu725szoovz",
+      "title": "Software Engineer, GovTech",
+      "company": "Lyft",
+      "location": "Toronto, Ontario, Canada",
+      "job_url": "https://hiringcafe.com/job/software-engineer-govtech-lyft-toronto-ontario-6c41bdu725szoovz?utm_source=claude&utm_medium=llm-app&utm_campaign=mcp",
+      "posted_at": "2026-10-16",
+      "discovered_at": "2026-10-22T21:36:32-04:00",
+      "source": "HiringCafe"
+    },
+    {
+      "job_id": "0nm5783psgnvi4q3",
+      "title": "It Security Analyst",
+      "company": "Fallsview Casino Resort",
+      "location": "Niagara Falls, Ontario, Canada",
+      "job_url": "https://hiringcafe.com/job/it-security-analyst-fallsview-casino-resort-niagara-falls-ontario-0nm5783psgnvi4q3?utm_source=claude&utm_medium=llm-app&utm_campaign=mcp",
+      "posted_at": "2026-10-16",
+      "discovered_at": "2026-10-22T21:36:32-04:00",
+      "source": "HiringCafe"
+    },
+    {
+      "job_id": "pd27fizpg2uquglz",
+      "title": "Sr. Analyst, IT Quality Assurance",
+      "company": "CIBC",
+      "location": "Toronto, Ontario, Canada",
+      "job_url": "https://hiringcafe.com/job/sr-analyst-it-quality-assurance-cibc-toronto-ontario-pd27fizpg2uquglz?utm_source=claude&utm_medium=llm-app&utm_campaign=mcp",
+      "posted_at": "2026-10-16",
+      "discovered_at": "2026-10-22T21:36:32-04:00",
+      "source": "HiringCafe"
+    },
+    {
+      "job_id": "wmdfh0a6cl9ju2xb",
+      "title": "Workflow Automations Specialist",
+      "company": "Yorkville University",
+      "location": "Toronto, Ontario, Canada",
+      "job_url": "https://hiringcafe.com/job/workflow-automations-specialist-yorkville-university-toronto-ontario-wmdfh0a6cl9ju2xb?utm_source=claude&utm_medium=llm-app&utm_campaign=mcp",
+      "posted_at": "2026-10-16",
+      "discovered_at": "2026-10-22T21:36:34-04:00",
+      "source": "HiringCafe"
+    },
+    {
+      "job_id": "ron6bvqcfkxmxusg",
+      "title": "Software Developer",
+      "company": "Geotab",
+      "location": "Oakville or Toronto or Waterloo",
+      "job_url": "https://hiringcafe.com/job/software-developer-geotab-oakville-ontario-ron6bvqcfkxmxusg?utm_source=claude&utm_medium=llm-app&utm_campaign=mcp",
+      "posted_at": "2026-10-20",
+      "discovered_at": "2026-10-22T21:36:31-04:00",
+      "source": "HiringCafe"
+    },
+    {
+      "job_id": "x1e1tmixjiykc9gn",
+      "title": "Automation / Electrical Engineer (Essential Of Manufacturing)",
+      "company": "Saint-Gobain",
+      "location": "Acton, Ontario, Canada",
+      "job_url": "https://hiringcafe.com/job/automation-electrical-engineer-essential-of-manufacturing-saint-x1e1tmixjiykc9gn?utm_source=claude&utm_medium=llm-app&utm_campaign=mcp",
+      "posted_at": "2026-10-21",
+      "discovered_at": "2026-10-22T21:36:33-04:00",
+      "source": "HiringCafe"
+    },
+    {
+      "job_id": "wbq0rxmtumde9k4j",
+      "title": "Platform Data Engineer",
+      "company": "360insights",
+      "location": "Whitby, Ontario, Canada",
+      "job_url": "https://hiringcafe.com/job/platform-data-engineer-360insights-whitby-ontario-wbq0rxmtumde9k4j?utm_source=claude&utm_medium=llm-app&utm_campaign=mcp",
+      "posted_at": "2026-10-21",
+      "discovered_at": "2026-10-22T21:36:34-04:00",
+      "source": "HiringCafe"
+    },
+    {
+      "job_id": "5izlmcb5x4rw2yme",
+      "title": "Junior Software Developer",
+      "company": "Kraun Electric",
+      "location": "St. Catharines, Ontario, Canada",
+      "job_url": "https://hiringcafe.com/job/junior-software-developer-kraun-electric-st-catharines-ontario-5izlmcb5x4rw2yme?utm_source=claude&utm_medium=llm-app&utm_campaign=mcp",
+      "posted_at": "2026-10-22",
+      "discovered_at": "2026-10-22T21:36:31-04:00",
+      "source": "HiringCafe"
+    },
+    {
+      "job_id": "g5nqivvqilrdo18f",
+      "title": "IT Service Desk Analyst",
+      "company": "Aurora Cannabis Inc.",
+      "location": "Brampton, Ontario, Canada",
+      "job_url": "https://hiringcafe.com/job/it-service-desk-analyst-aurora-cannabis-inc-brampton-ontario-g5nqivvqilrdo18f?utm_source=claude&utm_medium=llm-app&utm_campaign=mcp",
+      "posted_at": "2026-10-22",
+      "discovered_at": "2026-10-22T21:36:32-04:00",
+      "source": "HiringCafe"
+    }
+  ]
+}
