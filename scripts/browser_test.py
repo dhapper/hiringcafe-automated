@@ -16,7 +16,10 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 
-from portals import lever, workday
+from portals import lever
+
+# from scripts.portals import workday_old
+from portals.workday import handler as workday_handler
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
@@ -71,7 +74,8 @@ def dispatch_portal(driver, url: str) -> bool:
 
     if "workday" in normalized_url or "myworkdayjobs.com" in normalized_url:
         logger.info("Detected Workday. Starting handler.")
-        workday.run(driver)
+        # workday_old.run(driver)
+        workday_handler.run(driver)
         return True
 
     for keyword in PORTAL_KEYWORDS:
