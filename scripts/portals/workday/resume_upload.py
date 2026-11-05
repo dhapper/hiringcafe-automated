@@ -13,6 +13,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from .login import is_autofill_resume_visible
 from .register import WAIT_SECONDS
 
+import time
+
 
 class FileLoggerAdapter(logging.LoggerAdapter):
     """Add the source filename to every log message."""
@@ -169,7 +171,7 @@ def upload_resume(driver, wait, resume_path):
     file_input.send_keys(str(resume_path))
 
     logger.info("Sent the resume path to the file input.")
-    logger.info("Skipping the unreliable file-input value check.")
+    time.sleep(3)  # give Workday a moment to process the file input
 
     try:
         continue_button = WebDriverWait(

@@ -31,6 +31,13 @@ from .login import (
 )
 from .resume_upload import upload_resume
 from .my_information import scrape_my_information
+from .my_information_fill import fill_my_information
+from .application_pages import (
+    advance_page,
+    heading_visible,
+    page_headings,
+    run_application_pages,
+)
 
 
 class FileLoggerAdapter(logging.LoggerAdapter):
@@ -47,7 +54,7 @@ logger = FileLoggerAdapter(
 
 
 def run(driver):
-    """Run Workday account creation, sign-in, and resume upload."""
+    """Run Workday account creation, sign-in, resume upload, and every page."""
     wait = WebDriverWait(driver, WAIT_SECONDS, poll_frequency=0.5)
 
     # handler.py is in scripts/portals/workday/.
@@ -159,33 +166,60 @@ def run(driver):
 
         logger.info("Sign-in fields verified as populated.")
 
-        # Step 9: Retry Sign In until the resume page appears.
-        sign_in_success = click_sign_in_until_autofill_appears(driver)
+        # Step 9: Sign in. Returns "autofill" on a first visit, or "progress"
+        # when Workday saved earlier progress and skipped the resume page.
+        landing = click_sign_in_until_autofill_appears(driver)
 
-        if not sign_in_success:
+        if not landing:
             logger.error(
-                "Could not confirm the Autofill with Resume page after "
-                "%s Sign In attempts. Stopping for manual review.",
+                "Could not confirm a signed-in page after %s Sign In attempts. "
+                "Stopping for manual review.",
                 SIGN_IN_MAX_ATTEMPTS,
             )
             return
 
-        # Step 10: Locate the resume PDF.
-        resume_path = (
-            project_root / "resume" / "Dhaarshan_Preshanthan_Resume.pdf"
-        ).resolve()
+        if landing == "autofill":
+            # Step 10: Locate the resume PDF.
+            resume_path = (
+                project_root / "resume" / "Dhaarshan_Preshanthan_Resume.pdf"
+            ).resolve()
 
-        if not resume_path.is_file():
-            logger.error("Resume PDF not found: %s", resume_path)
-            return
+            if not resume_path.is_file():
+                logger.error("Resume PDF not found: %s", resume_path)
+                return
 
-        logger.info("Resume PDF exists and is ready to upload.")
+            logger.info("Resume PDF exists and is ready to upload.")
 
-        # Step 11: Upload resume, continue, and inspect the next page.
-        upload_resume(driver, wait, resume_path)
+            # Step 11: Upload the resume and continue to My Information.
+            upload_resume(driver, wait, resume_path)
+        else:
+            logger.info(
+                "Saved progress detected: Workday skipped the resume page. "
+                "Continuing from the current page."
+            )
 
-        # Step 11: My Information page.
-        scrape_my_information(driver, wait)
+        # Step 12: My Information page (Workday-specific fields), if that is
+        # where the application is.
+        if heading_visible(driver, "My Information"):
+            scrape_my_information(driver, wait)
+            headings_before = page_headings(driver)
+
+            left_blank = fill_my_information(driver)
+
+            if left_blank:
+                logger.warning(
+                    "Stopping on My Information: required fields are still blank: %s",
+                    left_blank,
+                )
+                return
+
+            # Step 13: Save and Continue, unless the filler already moved on.
+            if heading_visible(driver, "My Information"):
+                if not advance_page(driver, headings_before):
+                    return
+
+        # Step 14: Every later page uses the common scraper and filler.
+        run_application_pages(driver)
 
     except (FileNotFoundError, ValueError, RuntimeError) as exc:
         logger.error("%s", exc)

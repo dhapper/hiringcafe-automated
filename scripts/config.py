@@ -26,6 +26,7 @@ MAX_YEARS_EXPERIENCE = 5
 # The discovery script will still verify the exact posting date.
 POSTED_WITHIN_DAYS = 1
 
+
 # Request more results for each search, instead of only 10.
 RESULTS_PER_QUERY = 25
 

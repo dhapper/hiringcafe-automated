@@ -20,6 +20,7 @@ from portals import lever
 
 # from scripts.portals import workday_old
 from portals.workday import handler as workday_handler
+from portals import dayforcehcm, greenhouse, bamboo
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
@@ -35,8 +36,11 @@ APPLY_SELECTOR = '[data-testid="job-page-apply"]'
 PORTAL_KEYWORDS = (
     "lever",
     "workday",
+    "dayforcehcm",
     "ashbyhq",
     "workforcenow",
+    "greenhouse",
+    "bamboo",
 )
 
 logging.basicConfig(
@@ -78,6 +82,22 @@ def dispatch_portal(driver, url: str) -> bool:
         workday_handler.run(driver)
         return True
 
+    if "dayforcehcm" in normalized_url:
+        logger.info("Detected DayForce HCM. Starting handler.")
+        # workday_old.run(driver)
+        dayforcehcm.run(driver)
+        return True
+
+    if "greenhouse" in normalized_url:
+        logger.info("Detected Greenhouse. Starting handler.")
+        greenhouse.run(driver)
+        return True
+
+    if "bamboo" in normalized_url:
+        logger.info("Detected Bamboo. Starting handler.")
+        bamboo.run(driver)
+        return True
+
     for keyword in PORTAL_KEYWORDS:
         if keyword in normalized_url:
             logger.info("Detected application portal: %s", keyword)
@@ -89,6 +109,42 @@ def dispatch_portal(driver, url: str) -> bool:
 
     logger.warning("Unrecognized application portal: %s", url)
     logger.info("Leave the open browser page available for manual review.")
+    return False
+
+
+def _click_apply_button(driver):
+    """Open the application form by clicking Apply for This Job."""
+
+    selectors = (
+        "button[data-bi-id='careers-site-apply-button']",
+        "//button[.//span[normalize-space()='Apply for This Job']]",
+    )
+
+    for selector in selectors:
+        try:
+            if selector.startswith("//"):
+                buttons = driver.find_elements(By.XPATH, selector)
+            else:
+                buttons = driver.find_elements(By.CSS_SELECTOR, selector)
+
+            for button in buttons:
+                if button.is_displayed() and button.is_enabled():
+                    button.click()
+                    logger.info(
+                        "Clicked 'Apply for This Job'. Waiting for "
+                        "the application form to load."
+                    )
+                    time.sleep(3)
+                    return True
+
+        except WebDriverException:
+            logger.exception("Could not click the 'Apply for This Job' button.")
+            return False
+
+    logger.warning(
+        "'Apply for This Job' button was not found. "
+        "Continuing with the current page."
+    )
     return False
 
 
