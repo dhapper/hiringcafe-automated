@@ -11,8 +11,7 @@ import logging
 import subprocess
 import sys
 import time
-import urllib.error
-import urllib.request
+import requests
 from pathlib import Path
 
 from application_store import (
@@ -29,6 +28,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = PROJECT_ROOT / "data"
 JOBS_JSON = DATA_DIR / "jobs.json"
 CURRENT_JOB_JSON = DATA_DIR / "current_job_posting.json"
+TRACKER_PATH = DATA_DIR / "tracker_data.txt"
 BROWSER_SCRIPT = Path(__file__).resolve().parent / "browser_test.py"
 
 HIRINGCAFE_MCP_URL = "https://hiringcafe.com/api/mcp"
@@ -50,28 +50,30 @@ def mcp_request(method, params=None, request_id=1):
     if params is not None:
         payload["params"] = params
 
-    body = json.dumps(payload).encode("utf-8")
-    request = urllib.request.Request(
-        HIRINGCAFE_MCP_URL,
-        data=body,
-        headers={
-            "Content-Type": "application/json",
-            "Accept": "application/json, text/event-stream",
-        },
-        method="POST",
-    )
-
     try:
-        with urllib.request.urlopen(request, timeout=MCP_TIMEOUT_SECONDS) as response:
-            response_text = response.read().decode("utf-8")
+        response = requests.post(
+            HIRINGCAFE_MCP_URL,
+            json=payload,
+            headers={
+                "Content-Type": "application/json",
+                "Accept": "application/json, text/event-stream",
+            },
+            timeout=MCP_TIMEOUT_SECONDS,
+        )
 
-    except urllib.error.HTTPError as exc:
-        error_body = exc.read().decode("utf-8", errors="replace")
+        response.raise_for_status()
+        response_text = response.text
+
+    except requests.HTTPError as exc:
+        error_body = exc.response.text if exc.response is not None else str(exc)
+        status_code = (
+            exc.response.status_code if exc.response is not None else "unknown"
+        )
         raise RuntimeError(
-            f"HiringCafe MCP returned HTTP {exc.code}: " f"{error_body[:500]}"
+            f"HiringCafe MCP returned HTTP {status_code}: {error_body[:500]}"
         ) from exc
 
-    except (urllib.error.URLError, TimeoutError) as exc:
+    except requests.RequestException as exc:
         raise RuntimeError(f"Could not reach HiringCafe MCP: {exc}") from exc
 
     # MCP may respond with JSON or server-sent event data.
@@ -316,6 +318,86 @@ def normalize_job(job):
     }
 
 
+def normalize_tracker_location(location):
+    """Format job locations as City, Province Code."""
+    location = str(location or "").strip()
+
+    if not location or location.lower() == "unknown":
+        return "Unknown"
+
+    # Remove country suffixes.
+    location = location.replace(", Canada", "").replace(", canada", "").strip()
+
+    province_codes = {
+        "Ontario": "ON",
+        "Quebec": "QC",
+        "Alberta": "AB",
+        "British Columbia": "BC",
+        "Manitoba": "MB",
+        "Saskatchewan": "SK",
+        "Nova Scotia": "NS",
+        "New Brunswick": "NB",
+        "Newfoundland and Labrador": "NL",
+        "Prince Edward Island": "PE",
+        "Northwest Territories": "NT",
+        "Nunavut": "NU",
+        "Yukon": "YT",
+    }
+
+    for province, code in province_codes.items():
+        if location.lower().endswith(province.lower()):
+            city = location[: -len(province)].strip().rstrip(",").strip()
+            return f"{city}, {code}" if city else code
+
+    # Normalize locations already using province abbreviations.
+    import re
+
+    match = re.match(
+        r"^(.+?)[,\s]+(ON|QC|AB|BC|MB|SK|NS|NB|NL|PE|NT|NU|YT)$",
+        location,
+        re.IGNORECASE,
+    )
+
+    if match:
+        return f"{match.group(1).strip()}, {match.group(2).upper()}"
+
+    return location
+
+
+def clear_tracker_file():
+    """Clear the tracker at the beginning of a queue run."""
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+
+    with TRACKER_PATH.open("w", encoding="utf-8"):
+        pass
+
+    logger.info("Cleared tracker file: %s", TRACKER_PATH)
+
+
+def append_tracker_record(job):
+    """Append a confirmed application record to the tracker."""
+    company = job.get("company") or "Unknown"
+    title = job.get("title") or "Unknown title"
+    job_url = job.get("job_url") or ""
+    location = normalize_tracker_location(job.get("location"))
+
+    fields = [
+        company,
+        title,
+        "HiringCafe",
+        job_url,
+        "",
+        "",
+        location,
+        "AUTOMATED",
+    ]
+
+    with TRACKER_PATH.open("a", encoding="utf-8", newline="") as file:
+        file.write("\t".join(fields) + "\n")
+
+    logger.info("Added application record to tracker: %s - %s", company, title)
+
+
 def write_current_job_context(job):
     """Fetch the selected job description and save it to the context file."""
     record = get_application(job["job_id"]) or {}
@@ -519,6 +601,7 @@ def ask_outcome(job):
 
             if confirmation == "yes":
                 mark_applied(job["job_id"])
+                append_tracker_record(job)
                 return "continue"
 
             print("Not marked as applied.")
@@ -650,6 +733,8 @@ def main():
 
     logger.info("Starting HiringCafe application review queue.")
     logger.info("Using ledger: %s", CSV_PATH)
+
+    clear_tracker_file()
 
     jobs = load_discovered_jobs()
     queue = get_eligible_jobs(jobs)
