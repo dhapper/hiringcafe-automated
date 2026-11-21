@@ -1,9 +1,7 @@
 """Open a HiringCafe job and dispatch to its application portal.
 
-Uses the standard Selenium Chrome session for HiringCafe and most portals.
-
-For Lever, launches a separate regular Chrome session with remote debugging
-and attaches Selenium to that session.
+Uses one dedicated, persistent Chrome profile for HiringCafe and all
+supported application portals.
 
 Keeps Chrome open for manual review until application_flow.py signals
 that the user has selected an outcome. Never submits an application.
@@ -28,9 +26,11 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 from portals import lever
 from portals.workday import handler as workday_handler
-from portals import dayforcehcm, greenhouse, bamboo, ashbyhq, careerpuck, workable
+from portals import dayforcehcm, greenhouse, bamboo, ashbyhq, careerpuck, workable, gem
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
+CHROME_PROFILE_PATH = PROJECT_ROOT / "data" / "hiringcafe_chrome_profile"
 
 DEFAULT_TEST_URL = (
     "https://hiringcafe.com/job/"
@@ -51,7 +51,9 @@ PORTAL_KEYWORDS = (
     "bamboo",
     "careerpuck",
     "workable",
+    "gem",
 )
+
 
 logging.basicConfig(
     level=logging.INFO,
@@ -171,12 +173,18 @@ def get_available_port() -> int:
         return sock.getsockname()[1]
 
 
-def wait_for_debugger(port: int, timeout: int = 30):
+def wait_for_debugger(port: int, chrome_process, timeout: int = 30):
     """Wait until Chrome's remote debugging endpoint is available."""
 
     deadline = time.time() + timeout
 
     while time.time() < deadline:
+
+        if chrome_process.poll() is not None:
+            raise RuntimeError(
+                "Chrome exited before its remote debugging endpoint became ready."
+            )
+
         try:
             with socket.create_connection(
                 ("127.0.0.1", port),
@@ -194,24 +202,44 @@ def wait_for_debugger(port: int, timeout: int = 30):
     raise TimeoutError("Chrome did not start its remote debugging endpoint in time.")
 
 
-def create_lever_driver():
-    """Launch regular Chrome and attach Selenium to it for Lever."""
+def stop_chrome_process(chrome_process):
+    """Terminate the Chrome process if it is still running."""
+
+    if chrome_process is None or chrome_process.poll() is not None:
+        return
+
+    try:
+        logger.info("Stopping the dedicated automation Chrome process.")
+        chrome_process.terminate()
+
+        try:
+            chrome_process.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            logger.warning("Chrome did not exit normally. Forcing shutdown.")
+            chrome_process.kill()
+            chrome_process.wait(timeout=5)
+
+    except Exception:
+        logger.exception("Could not cleanly stop the Chrome process.")
+
+
+def create_browser_driver():
+    """Launch Chrome with the shared persistent automation profile."""
 
     chrome_path = find_chrome_executable()
 
-    profile_path = PROJECT_ROOT / "data" / "lever_chrome_profile"
-    profile_path.mkdir(parents=True, exist_ok=True)
+    CHROME_PROFILE_PATH.mkdir(parents=True, exist_ok=True)
 
     port = get_available_port()
 
-    logger.info("Launching regular Chrome for Lever.")
-    logger.info("Using Chrome profile: %s", profile_path)
+    logger.info("Launching the shared automation Chrome session.")
+    logger.info("Using Chrome profile: %s", CHROME_PROFILE_PATH)
 
     chrome_process = subprocess.Popen(
         [
             chrome_path,
             f"--remote-debugging-port={port}",
-            f"--user-data-dir={profile_path}",
+            f"--user-data-dir={CHROME_PROFILE_PATH.resolve()}",
             "--no-first-run",
             "--no-default-browser-check",
             "about:blank",
@@ -221,81 +249,54 @@ def create_lever_driver():
     )
 
     try:
-        wait_for_debugger(port)
-    except Exception:
-        logger.exception("Could not start Chrome for Lever.")
-        raise
+        wait_for_debugger(port, chrome_process)
 
-    options = Options()
-    options.add_experimental_option(
-        "debuggerAddress",
-        f"127.0.0.1:{port}",
-    )
+        options = Options()
+        options.add_experimental_option(
+            "debuggerAddress",
+            f"127.0.0.1:{port}",
+        )
 
-    logger.info("Attaching Selenium to the Lever Chrome session.")
+        logger.info("Attaching Selenium to the shared Chrome session.")
 
-    try:
         driver = webdriver.Chrome(options=options)
+
+        # Keep references so the Chrome process can be closed later.
+        driver._automation_chrome_process = chrome_process
+        driver._automation_chrome_profile = str(CHROME_PROFILE_PATH)
+        driver._automation_debugging_port = port
+
+        logger.info("Successfully connected to the shared Chrome session.")
+
+        return driver
+
     except Exception:
-        logger.exception("Could not attach Selenium to Lever Chrome.")
+        logger.exception("Could not create the shared Chrome session.")
+        stop_chrome_process(chrome_process)
         raise
 
-    # Keep the Chrome process referenced for the driver's lifetime.
-    driver._lever_chrome_process = chrome_process
 
-    return driver
+def close_browser(driver):
+    """Close Selenium and the Chrome process started by this script."""
 
+    if driver is None:
+        return
 
-def create_workable_driver():
-    """Launch regular Chrome and attach Selenium to it for Workable."""
-
-    chrome_path = find_chrome_executable()
-
-    profile_path = PROJECT_ROOT / "data" / "workable_chrome_profile"
-    profile_path.mkdir(parents=True, exist_ok=True)
-
-    port = get_available_port()
-
-    logger.info("Launching regular Chrome for Workable.")
-    logger.info("Using Chrome profile: %s", profile_path)
-
-    chrome_process = subprocess.Popen(
-        [
-            chrome_path,
-            f"--remote-debugging-port={port}",
-            f"--user-data-dir={profile_path}",
-            "--no-first-run",
-            "--no-default-browser-check",
-            "about:blank",
-        ],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
+    chrome_process = getattr(
+        driver,
+        "_automation_chrome_process",
+        None,
     )
 
     try:
-        wait_for_debugger(port)
-    except Exception:
-        logger.exception("Could not start Chrome for Workable.")
-        raise
+        driver.quit()
+        logger.info("Selenium browser session closed.")
 
-    options = Options()
-    options.add_experimental_option(
-        "debuggerAddress",
-        f"127.0.0.1:{port}",
-    )
+    except WebDriverException:
+        logger.warning("Selenium browser session was already closed.")
 
-    logger.info("Attaching Selenium to the Workable Chrome session.")
-
-    try:
-        driver = webdriver.Chrome(options=options)
-    except Exception:
-        logger.exception("Could not attach Selenium to Workable Chrome.")
-        raise
-
-    # Keep the Chrome process referenced for the driver's lifetime.
-    driver._workable_chrome_process = chrome_process
-
-    return driver
+    finally:
+        stop_chrome_process(chrome_process)
 
 
 def dispatch_portal(driver, url: str) -> bool:
@@ -343,6 +344,11 @@ def dispatch_portal(driver, url: str) -> bool:
         workable.run(driver)
         return True
 
+    if "gem" in normalized_url:
+        logger.info("Detected Gem. Starting handler.")
+        gem.run(driver)
+        return True
+
     for keyword in PORTAL_KEYWORDS:
         if keyword in normalized_url:
             logger.info("Detected application portal: %s", keyword)
@@ -366,9 +372,8 @@ def main():
 
     logger.info("Opening HiringCafe job: %s", job_url)
 
-    # Start with the normal Selenium browser for HiringCafe.
-    options = Options()
-    driver = webdriver.Chrome(options=options)
+    # All sites now use this one Chrome session and profile.
+    driver = create_browser_driver()
 
     workflow_completed = False
 
@@ -408,6 +413,7 @@ def main():
                     or d.current_url != original_url
                 )
             )
+
         except TimeoutException:
             logger.warning("No new tab or URL change detected within 15 seconds.")
 
@@ -416,6 +422,8 @@ def main():
         portal_handle = None
         portal_url = None
 
+        # Inspect all tabs. The application portal may open in a new tab
+        # or replace the original HiringCafe tab.
         for index, handle in enumerate(driver.window_handles, start=1):
             try:
                 driver.switch_to.window(handle)
@@ -442,78 +450,9 @@ def main():
         else:
             logger.info("Selected portal URL: %s", portal_url)
 
-            if is_lever_url(portal_url):
-                logger.info("Lever detected. Switching to the regular Chrome session.")
-
-                # Launch a separate regular Chrome session for Lever.
-                lever_driver = create_lever_driver()
-
-                try:
-                    lever_driver.get(portal_url)
-
-                    WebDriverWait(lever_driver, 30).until(
-                        lambda d: (
-                            d.execute_script("return document.readyState") == "complete"
-                        )
-                    )
-
-                    time.sleep(3)
-
-                except Exception:
-                    try:
-                        lever_driver.quit()
-                    except WebDriverException:
-                        pass
-                    raise
-
-                # The HiringCafe browser is no longer needed.
-                try:
-                    driver.quit()
-                except WebDriverException:
-                    logger.warning(
-                        "The original HiringCafe browser was already closed."
-                    )
-
-                # Continue the workflow using the Lever browser.
-                driver = lever_driver
-            elif is_workable_url(portal_url):
-                logger.info(
-                    "Workable detected. Switching to the regular Chrome session."
-                )
-
-                # Launch a separate regular Chrome session for Workable.
-                workable_driver = create_workable_driver()
-
-                try:
-                    workable_driver.get(portal_url)
-
-                    WebDriverWait(workable_driver, 30).until(
-                        lambda d: (
-                            d.execute_script("return document.readyState") == "complete"
-                        )
-                    )
-
-                    time.sleep(3)
-
-                except Exception:
-                    try:
-                        workable_driver.quit()
-                    except WebDriverException:
-                        pass
-                    raise
-
-                # The HiringCafe browser is no longer needed.
-                try:
-                    driver.quit()
-                except WebDriverException:
-                    logger.warning(
-                        "The original HiringCafe browser was already closed."
-                    )
-
-                # Continue the workflow using the Workable browser.
-                driver = workable_driver
-            else:
-                driver.switch_to.window(portal_handle)
+            # No separate browser launches. Lever, Workable, and every
+            # other portal continue in this same Chrome session.
+            driver.switch_to.window(portal_handle)
 
             dispatch_portal(driver, portal_url)
 
@@ -548,11 +487,7 @@ def main():
                 "Browser workflow did not complete successfully; closing Chrome."
             )
 
-        try:
-            driver.quit()
-            logger.info("Chrome closed.")
-        except WebDriverException:
-            logger.warning("Chrome was already closed.")
+        close_browser(driver)
 
 
 if __name__ == "__main__":

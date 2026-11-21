@@ -258,6 +258,126 @@ def _ant_select_by_form_item_label(driver, label):
     return matches[0] if len(matches) == 1 else None
 
 
+def _locate_by_context(driver, control):
+    """
+    Fallback for custom forms whose inputs have no id, name, or associated label.
+
+    Finds a unique visible input or textarea through its surrounding question
+    text. Returns None when the match is ambiguous.
+    """
+    context = (
+        control.get("context") or control.get("question") or control.get("label") or ""
+    )
+    context = _normalize_space(context)
+
+    if not context or len(context) > 200:
+        return None
+
+    tag = (control.get("tag") or "").lower()
+
+    if tag not in {"input", "textarea"}:
+        return None
+
+    script = r"""
+    const wanted = arguments[0]
+        .replace(/\s*\*+\s*$/, "")
+        .replace(/\s+/g, " ")
+        .trim()
+        .toLowerCase();
+
+    const expectedTag = arguments[1];
+
+    const normalize = value =>
+        String(value || "")
+            .replace(/\s+/g, " ")
+            .trim()
+            .replace(/\s*\*+\s*$/, "")
+            .toLowerCase();
+
+    const visible = element => {
+        const style = window.getComputedStyle(element);
+        const rect = element.getBoundingClientRect();
+
+        return style.display !== "none" &&
+            style.visibility !== "hidden" &&
+            rect.width > 0 &&
+            rect.height > 0;
+    };
+
+    const candidates = [];
+
+    const selector = expectedTag === "textarea"
+        ? "textarea"
+        : "input:not([type='hidden']):not([type='file']):not([type='submit']):not([type='button']):not([type='checkbox']):not([type='radio']):not([type='password'])";
+
+    for (const field of document.querySelectorAll(selector)) {
+        if (!visible(field) || field.disabled || field.readOnly) {
+            continue;
+        }
+
+        let parent = field.parentElement;
+        let bestMatch = null;
+
+        // Search progressively larger surrounding containers.
+        for (let depth = 0; parent && depth < 7; depth++) {
+            const text = normalize(parent.innerText || parent.textContent);
+
+            if (!text) {
+                parent = parent.parentElement;
+                continue;
+            }
+
+            const exact = text === wanted;
+            const contains = text.includes(wanted);
+
+            // Prefer exact matches. Allow a small amount of additional
+            // container text for custom React form layouts.
+            if (exact || (contains && text.length <= wanted.length + 45)) {
+                const score = text.length - wanted.length;
+
+                if (!bestMatch || score < bestMatch.score) {
+                    bestMatch = { score };
+                }
+            }
+
+            parent = parent.parentElement;
+        }
+
+        if (bestMatch) {
+            candidates.push({
+                element: field,
+                score: bestMatch.score
+            });
+        }
+    }
+
+    if (!candidates.length) {
+        return null;
+    }
+
+    candidates.sort((a, b) => a.score - b.score);
+
+    // Do not guess if multiple fields are equally plausible.
+    if (
+        candidates.length > 1 &&
+        candidates[0].score === candidates[1].score
+    ) {
+        return null;
+    }
+
+    return candidates[0].element;
+    """
+
+    try:
+        return driver.execute_script(script, context, tag)
+    except WebDriverException:
+        logger.exception(
+            "Could not locate field using surrounding question text: %s",
+            context,
+        )
+        return None
+
+
 def _locate(driver, control):
     """Return (element, wrapper), where wrapper is an Ant or React Select shell."""
     field_id = control.get("id") or ""
@@ -280,25 +400,48 @@ def _locate(driver, control):
     if control_type == "checkbox-single":
         return _checkbox_wrapper(driver, control), None
 
+    # Preserve existing ID-based lookup.
     if field_id:
         element = _first(driver, f'[id="{field_id}"]')
+
+    # Preserve existing name-based lookup.
     elif name:
         element = _first(driver, f'[name="{name}"]')
+
+    # Preserve existing known-label lookup.
     else:
         known_id = _KNOWN_IDS_BY_LABEL.get(label.casefold())
         if known_id:
             element = _first(driver, f'[id="{known_id}"]')
+
         if element is None:
-            return None, _ant_select_by_form_item_label(driver, label)
+            ant_wrapper = _ant_select_by_form_item_label(driver, label)
+
+            if ant_wrapper is not None:
+                return None, ant_wrapper
+
+            # New fallback for custom forms such as Gem.
+            element = _locate_by_context(driver, control)
+
+    # If an existing locator found nothing, try the new fallback too.
+    if element is None:
+        ant_wrapper = _ant_select_by_form_item_label(driver, label)
+
+        if ant_wrapper is not None:
+            return None, ant_wrapper
+
+        element = _locate_by_context(driver, control)
 
     if element is None:
         return None, None
+
     if element.tag_name.lower() == "select":
         return element, None
 
     react_wrapper = _react_select_wrapper(element)
     if react_wrapper is not None:
         return element, react_wrapper
+
     return element, _ant_wrapper(element)
 
 
